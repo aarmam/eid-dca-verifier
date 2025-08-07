@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta id="csrf-token" th:content="${_csrf.token}"/>
+    <meta id="csrf-header" th:content="${_csrf.headerName}"/>
+    <title>Demo Verifier</title>
+    <link rel="icon" th:href="@{/assets/favicon.ico}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <h1>Demo Verifier</h1>
+    <button id="login-button">Login</button>
+    <div id="error-message" class="error-message"></div>
+    <script type="module">
+        const csrfToken = document.getElementById('csrf-token').content;
+        const csrfHeaderName = document.getElementById('csrf-header').content;
+        const errorMessage = document.getElementById("error-message")
+        const loginButton = document.getElementById('login-button');
+        const api = async (cmd, params) => {
+            const response = await fetch(cmd, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    [csrfHeaderName]: csrfToken
+                },
+                body: JSON.stringify(params)
+            });
+            if (!response.ok) throw new Error((await response.json()).error || 'Authentication failed');
+            return response.json();
+        };
+
+        loginButton.addEventListener("click", async () => {
+            errorMessage.innerText = '';
+            try {
+                const challengeNonce = await api('/login/vp/challenge');
+                const {data} = await navigator.credentials.get({
+                    digital: {
+                        requests: [{
+                            protocol: 'openid4vp',
+                            data: {
+                                dcql_query: {
+                                    credentials: [
+                                        {
+                                            format: "mso_mdoc",
+                                            id: "eidCredential",
+                                            meta: {
+                                                doctype_value: "eu.europa.ec.eudi.eid.1"
+                                            }
+                                        }
+                                    ]
+                                },
+                                nonce: challengeNonce['nonce'],
+                                response_mode: "dc_api",
+                                response_type: "vp_token"
+                            }
+                        }]
+                    },
+                })
+
+                const {authenticated, redirectUrl} = await api('/login/vp', data);
+                if (authenticated && redirectUrl) window.location.href = redirectUrl;
+            } catch (error) {
+                errorMessage.innerText = error.message || 'An error occurred during login';
+            }
+        });
+    </script>
+</body>
+</html>

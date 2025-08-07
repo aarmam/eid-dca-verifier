@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta id="csrf-token" th:content="${_csrf.token}"/>
+    <meta id="csrf-header" th:content="${_csrf.headerName}"/>
+    <link rel="icon" th:href="@{/assets/favicon.ico}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <title>Demo Verifier</title>
+</head>
+
+<body>
+<h1>Authenticated user</h1>
+<div sec:authentication="principal.name"></div>
+<div sec:authentication="principal.idCode"></div>
+<button onclick="logout()">Logout</button>
+<script type="module">
+    const csrfToken = document.getElementById('csrf-token').content;
+    const csrfHeaderName = document.getElementById('csrf-header').content;
+    window.logout = async () => {
+        await fetch("/logout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeaderName]: csrfToken
+            }
+        });
+        window.location.href = "/login";
+    }
+</script>
+</body>
+</html>

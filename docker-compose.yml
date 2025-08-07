@@ -1,0 +1,28 @@
+services:
+
+  dozzle:
+    image: amir20/dozzle:latest
+    networks:
+      default:
+        aliases:
+          - dozzle.localhost
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  eid-dca-verifier:
+    image: eid-dca-verifier:latest
+    environment:
+      - BPL_DEBUG_ENABLED=true
+      - BPL_JVM_THREAD_COUNT=10
+    networks:
+      default:
+        aliases:
+          - rp.localhost
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+    restart: unless-stopped
+
