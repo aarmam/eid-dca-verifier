@@ -1,0 +1,26 @@
+server:
+  port: 8443
+  ssl:
+    protocol: TLS
+    enabled-protocols: TLSv1.3
+    bundle: tls
+  servlet:
+    session:
+      cookie:
+        name: __Host-JSESSIONID
+
+spring:
+  application:
+    name: eid-dca-rp
+  main:
+    banner-mode: off
+  ssl:
+    bundle:
+      pem:
+        tls:
+          keystore:
+            certificate: classpath:rp.localhost.crt
+            private-key: classpath:rp.localhost.key
+        issuer-ca:
+          truststore:
+            certificate: classpath:test-of-ESTEID2018.crt
