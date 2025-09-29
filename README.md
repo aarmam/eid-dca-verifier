@@ -3,6 +3,13 @@
 Proof of concept verifier for the [Digital Credential API](https://github.com/w3c-fedid/digital-credentials) accepting Estonian ID card self-signed authentication credential in [ISO/IEC 18013-5](https://www.iso.org/standard/69084.html) format. 
 To generate and present the authentication credential, use the [eid-dca](https://github.com/aarmam/eid-dca) wallet.
 
+## Requirements
+
+- Chrome 128 or later
+- Enable the flag at chrome://flags#web-identity-digital-credentials
+
+Read more about the [Digital Credentials API origin trial](https://developer.chrome.com/blog/digital-credentials-api-origin-trial)
+
 ## Running in Docker
 
 Build docker image locally
